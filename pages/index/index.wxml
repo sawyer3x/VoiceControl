@@ -1,18 +1,26 @@
 <!--index.wxml-->
 <view class="container">
   <view class="userinfo">
-    <button wx:if="{{!hasUserInfo && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 获取头像昵称 </button>
+    <button wx:if="{{!hasUserInfo && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 请登录使用 </button>
     <block wx:else>
       <image bindtap="bindViewTap" class="userinfo-avatar" src="{{userInfo.avatarUrl}}" mode="cover"></image>
       <text class="userinfo-nickname">{{userInfo.nickName}}</text>
-      <view wx:if="{{ isSpeaking }}">
-        <image class="sound-style" src="../../imgs/recording.gif"></image>
-      </view>
-      <button bindtouchstart="start" bindtouchend="stop">录音</button>
-      <button bindtap="playRecord">播放录音</button>
     </block>
   </view>
-  <view class="usermotto">
-    <text class="user-motto">{{motto}}</text>
+  <view class="recordTextView">
+    {{text}}
   </view>
+  <view class='recordView' wx:if="{{isLogin == true}}">
+      <!-- 同声传译 -->
+      <button class="recordBtn {{recordState == true ? 'recordBtnBg':''}}" bindtouchstart="touchStart" bindtouchend="touchEnd">
+        <text wx:if="{{recordState == false}}">按住 说话</text>
+        <text wx:else>松开 结束</text>
+      </button>
+      <!-- 开始语音 弹出语音图标表示正在录音 -->
+      <cover-view class="startRecordImage" wx:if="{{recordState == true}}">
+        <cover-image src="../../imgs/recording.gif"></cover-image>
+        <cover-view>请说...</cover-view>
+      </cover-view>
+      
+    </view>
 </view>

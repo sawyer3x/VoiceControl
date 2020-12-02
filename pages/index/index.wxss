@@ -16,8 +16,93 @@
   color: #aaa;
 }
 
-.usermotto {
-  margin-top: 200px;
+.recordTextView {
+  /* 文字居中 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  position: absolute;
+  bottom: 396rpx;
+}
+.recordView {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.recordBtn {
+  width: 70%;
+  height: 70rpx;
+  position: absolute;
+  /* right: 112rpx; */
+  bottom: 306rpx;
+  border: 1px solid #eee;
+  background: #fff;
+  color: #606267;
+
+    /* 文字居中 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+ 
+.recordBtnBg {
+  background: #eee;
+}
+ 
+.recordBtn::after {
+  /* background: #fff; *//* color: #000; */
+  border-radius: 0;
+  border: none;
+}
+ 
+.startRecordImage {
+  position: fixed;
+  top: 480rpx;
+  left: 50%;
+  width: 190rpx;
+  height: 240rpx;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 20rpx;
+  color: #fff;
+  text-align: center;
+  margin-left: -95rpx;
+}
+ 
+.startRecordImage cover-image {
+  margin: 30rpx auto;
+  width: 100rpx;
+  height: 100rpx;
+}
+ 
+.startRecordImage cover-view {
+  margin-top: 25rpx;
+}
+
+.recBtn {
+  width: 70%;
+  height: 70rpx;
+  position: absolute;
+  /* right: 112rpx; */
+  bottom: 206rpx;
+  border: 1px solid #eee;
+  background: #fff;
+  color: #606267;
+
+  /* 文字居中 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+ 
+.recBtnBg {
+  background: #eee;
+}
+ 
+.recBtn::after {
+  /* background: #fff; *//* color: #000; */
+  border-radius: 0;
+  border: none;
 }
 
 .sound-style{
@@ -25,5 +110,5 @@
   width: 200rpx;
   height: 150rpx;
   margin-top: 200rpx;
-  margin-left: 100rpx;
+  /* margin-left: 100rpx; */
 }
