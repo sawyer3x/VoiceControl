@@ -1,7 +1,6 @@
 {
   "pages":[
-    "pages/index/index",
-    "pages/recordToText/record-to-text"
+    "pages/index/index"
   ],
   "window":{
     "backgroundTextStyle":"light",
