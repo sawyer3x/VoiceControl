@@ -6,6 +6,10 @@ const manager = plugin.getRecordRecognitionManager();
 
 //获取应用实例
 const app = getApp()
+//上传服务器的地址
+const requestURL = 'https://ai.datacvg.com/aivoice/upload_voice'
+//'http://116.62.44.17/aivoice/upload_voice'
+//'http://192.168.0.59:8080/upload_voice' 
 
 //获取全局唯一的语音识别管理器recordRecoManager
 const recorderManager = wx.getRecorderManager() //录音对象
@@ -22,6 +26,9 @@ Page({
     //语音
     recordState: false, //录音状态
     content:'',//内容
+
+    startTime: '',
+    endTime: ''
   },
   bindViewTap: function() {
     wx.navigateTo({
@@ -102,19 +109,39 @@ Page({
           fileUrl: tempFilePath
         })
 
+        that.uploadText()
         // setTimeout(function() {
           //上传
-          that.upload()
+          // that.upload()
         // }, 500)
     })
   },
   //调接口
+  uploadText() {
+    wx.request({
+      url: requestURL,
+      header: {
+        contentType: "multipart/form-data", //按需求增加
+      },
+      formData: {
+        user_id: '10001',//（String，用户id）
+        voice_t: this.data.text,//（String，语音文本）
+      },
+      success: function (res) {
+        console.log("上传成功")
+      },
+      fail: function(err) {
+        console.log("上传失败")
+        console.log(err.errMsg)
+      }
+    })
+  },
   upload(){
     //上传文件
     wx.uploadFile({
       filePath: this.data.fileUrl,
       name: 'file',
-      url: 'http://192.168.0.59:8080/upload_voice', //上传服务器的地址
+      url: requestURL, //上传服务器的地址
       header: {
         contentType: "multipart/form-data", //按需求增加
       },
@@ -147,6 +174,11 @@ Page({
     // 识别错误事件
     manager.onError = function (res) {
       console.error("error msg", res)
+      if (that.data.endTime - that.data.startTime >= 500) {
+        wx.showToast({
+          title: '请重新说一遍',
+        })
+      }
     }
     //识别结束事件
     manager.onStop = function (res) {
@@ -170,12 +202,13 @@ Page({
         fileUrl: res.tempFilePath
       })
 
-      // that.upload()
+      that.upload()
     }
   },
   // 按住说话
   touchStart: function (e) {
     this.setData({
+      startTime: e.timeStamp,
       recordState: true  //录音状态
     })
     // 同声传译语音开始识别
@@ -188,8 +221,16 @@ Page({
   //语音  --松开结束
   touchEnd: function (e) {
     this.setData({
-      recordState: false
+      recordState: false,
+      endTime: e.timeStamp
     })
+
+    if (this.data.endTime - this.data.startTime < 500) {
+      wx.showToast({
+        title: '请按住说话',
+      })
+    }
+    
     // 语音结束识别
     manager.stop();
     // this.stop()
