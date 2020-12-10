@@ -7,6 +7,7 @@ const manager = plugin.getRecordRecognitionManager();
 //获取应用实例
 const app = getApp()
 //上传服务器的地址
+// const requestURL = 'http://192.168.0.13:8042/upload_voice'
 const requestURL = 'https://ai.datacvg.com/aivoice/upload_voice'
 //'http://116.62.44.17/aivoice/upload_voice'
 //'http://192.168.0.59:8080/upload_voice' 
@@ -80,72 +81,15 @@ Page({
       hasUserInfo: true
     })
   },
-  //录音开始
-  start: function() {
-    console.log('开始录音11111')
-    const options = {
-      duration: 6000,
-      format: 'wav',
-      sampleRate: 16000, //采样率
-      numberOfChannels: 1, //录音通道数
-      encodeBitRate: 96000, //编码码率
-    }
-    recorderManager.start(options)
-  },
-  //录音结束
-  stop: function() {
-    console.log('结束录音')
-    var that = this
-    recorderManager.stop() //停止录音
-
-    //监听录音结束事件
-    recorderManager.onStop((res) => {
-      console.log('监听录音结束事件', res)
- 
-        var tempFilePath = res.tempFilePath //文件临时路径
-        console.log('文件临时路径：', tempFilePath)
-       
-        that.setData({
-          fileUrl: tempFilePath
-        })
-
-        that.uploadText()
-        // setTimeout(function() {
-          //上传
-          // that.upload()
-        // }, 500)
-    })
-  },
   //调接口
   uploadText() {
     wx.request({
+      // method: "POST",
       url: requestURL,
       header: {
-        contentType: "multipart/form-data", //按需求增加
+        contentType: "application/json", //按需求增加
       },
-      formData: {
-        user_id: '10001',//（String，用户id）
-        voice_t: this.data.text,//（String，语音文本）
-      },
-      success: function (res) {
-        console.log("上传成功")
-      },
-      fail: function(err) {
-        console.log("上传失败")
-        console.log(err.errMsg)
-      }
-    })
-  },
-  upload(){
-    //上传文件
-    wx.uploadFile({
-      filePath: this.data.fileUrl,
-      name: 'file',
-      url: requestURL, //上传服务器的地址
-      header: {
-        contentType: "multipart/form-data", //按需求增加
-      },
-      formData: {
+      data: {
         user_id: '10001',//（String，用户id）
         voice_t: this.data.text,//（String，语音文本）
       },
@@ -202,7 +146,7 @@ Page({
         fileUrl: res.tempFilePath
       })
 
-      that.upload()
+      that.uploadText()
     }
   },
   // 按住说话
@@ -215,8 +159,6 @@ Page({
     manager.start({
       lang: 'zh_CN',// 识别的语言，目前支持zh_CN en_US zh_HK sichuanhua
     })
-    //录音同时开始
-    // this.start()
   },
   //语音  --松开结束
   touchEnd: function (e) {
@@ -233,6 +175,5 @@ Page({
     
     // 语音结束识别
     manager.stop();
-    // this.stop()
   },
 })
