@@ -1,10 +1,16 @@
 <!--index.wxml-->
+<view class="page">
 <view class="container">
   <view class="userinfo">
     <button wx:if="{{!hasUserInfo && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 请登录使用 </button>
     <block wx:else>
       <image bindtap="bindViewTap" class="userinfo-avatar" src="{{userInfo.avatarUrl}}" mode="cover"></image>
-      <text class="userinfo-nickname">{{userInfo.nickName}}</text>
+      <view class="userinfo-nickname"> {{userInfo.nickName}}，您好！
+        <text>欢迎使用，您可以这样问我：</text>
+        <text class="tip-text" wx:for="{{tips}}" wx:key="index">
+          {{item}}
+        </text>
+      </view>
     </block>
   </view>
   <view class="recordTextView">
@@ -12,7 +18,11 @@
   </view>
   <view class='recordView' wx:if="{{isLogin == true}}">
       <!-- 同声传译 -->
-      <button class="recordBtn {{recordState == true ? 'recordBtnBg':''}}" catchtouchstart="touchStart" catchtouchend="touchEnd">
+      <button class="recordBtn {{recordState == true ? 'recordBtnBg':''}}" 
+      catchtouchstart="touchStart" 
+      catchtouchcancel="touchCancel"
+      catchtouchend="touchEnd"
+      >
         <text wx:if="{{recordState == false}}">按住 说话</text>
         <text wx:else>松开 结束</text>
       </button>
@@ -22,5 +32,6 @@
         <cover-view>请说...</cover-view>
       </cover-view>
 
-    </view>
+  </view>
+</view>
 </view>

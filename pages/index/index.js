@@ -7,8 +7,8 @@ const manager = plugin.getRecordRecognitionManager();
 //获取应用实例
 const app = getApp()
 //上传服务器的地址
-// const requestURL = 'http://192.168.0.13:8042/upload_voice'
-const requestURL = 'https://ai.datacvg.com/aivoice/upload_voice'
+const requestURL = 'http://192.168.0.13:8042/upload_voice'
+// const requestURL = 'https://ai.datacvg.com/aivoice/upload_voice'
 //'http://116.62.44.17/aivoice/upload_voice'
 //'http://192.168.0.59:8080/upload_voice' 
 
@@ -29,7 +29,13 @@ Page({
     content:'',//内容
 
     startTime: '',
-    endTime: ''
+    endTime: '',
+    tips: ['1.“时间”“企业名称”的经营状况',
+           '2.“企业名称”的位置',
+           '3.“时间“，“区域”的经济状况', 
+           '4.“区域”“标签”“指标以及范围”的企业分布情况', 
+           '5.“时间”“区域”“标签”“指标以及范围”的企业列表'
+          ],
   },
   bindViewTap: function() {
     wx.navigateTo({
@@ -40,6 +46,9 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function () {
+    //识别语音
+    this.initRecord();
+        
     if (app.globalData.userInfo) {
       this.setData({
         isLogin: true,
@@ -69,8 +78,6 @@ Page({
         }
       })
     }
-    //识别语音
-    this.initRecord();
   },
   getUserInfo: function(e) {
     console.log(e)
@@ -151,17 +158,30 @@ Page({
   },
   // 按住说话
   touchStart: function (e) {
-    this.setData({
-      startTime: e.timeStamp,
-      recordState: true  //录音状态
-    })
     // 同声传译语音开始识别
     manager.start({
       lang: 'zh_CN',// 识别的语言，目前支持zh_CN en_US zh_HK sichuanhua
     })
+    this.setData({
+      startTime: e.timeStamp,
+      recordState: true  //录音状态
+    })
+  },
+  // 动作被打断，如弹窗和来电提醒
+  touchCancel: function (e) {
+        // 语音结束识别
+        manager.stop();
+
+        this.setData({
+          stop: e.timeStamp,
+          recordState: false  //录音状态
+        })
   },
   //语音  --松开结束
   touchEnd: function (e) {
+    // 语音结束识别
+    manager.stop();
+
     this.setData({
       recordState: false,
       endTime: e.timeStamp
@@ -173,7 +193,5 @@ Page({
       })
     }
     
-    // 语音结束识别
-    manager.stop();
   },
 })

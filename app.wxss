@@ -1,4 +1,11 @@
 /**app.wxss**/
+/*设置根节点，高度占满整个屏幕 */
+.page{
+  height: 100%;
+  width: 100%;
+  position: absolute;
+}
+
 .container {
   height: 100%;
   display: flex;
@@ -7,4 +14,6 @@
   justify-content: space-between;
   padding: 200rpx 0;
   box-sizing: border-box;
+  background-color: #F5F5F5;
+
 } 
