@@ -19,12 +19,10 @@
   <view class='recordView' wx:if="{{isLogin == true}}">
       <!-- 同声传译 -->
       <button class="recordBtn {{recordState == true ? 'recordBtnBg':''}}" 
-      catchtouchstart="touchStart" 
-      catchtouchcancel="touchCancel"
-      catchtouchend="touchEnd"
+      catchtap="touchTap" 
       >
-        <text wx:if="{{recordState == false}}">按住 说话</text>
-        <text wx:else>松开 结束</text>
+        <text wx:if="{{recordState == false}}">点击 说话</text>
+        <text wx:else>点击 结束</text>
       </button>
       <!-- 开始语音 弹出语音图标表示正在录音 -->
       <cover-view class="startRecordImage" wx:if="{{recordState == true}}">

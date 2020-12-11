@@ -3,7 +3,14 @@
 //引入插件 微信同声传译
 const plugin = requirePlugin('WechatSI')
 const manager = plugin.getRecordRecognitionManager();
-
+// 设置采集声音参数
+const options = {
+  sampleRate: 44100,
+  numberOfChannels: 1,
+  encodeBitRate: 192000,
+  format: 'mp3',
+  lang: 'zh_CN',// 识别的语言，目前支持zh_CN en_US zh_HK sichuanhua
+}
 //获取应用实例
 const app = getApp()
 //上传服务器的地址
@@ -127,8 +134,14 @@ Page({
       console.error("error msg", res)
       if (that.data.endTime - that.data.startTime >= 500) {
         wx.showToast({
-          title: '请重新说一遍',
+          title: '听不清楚，请重新说一遍',
         })
+        if (that.data.recordState == true) {
+          manager.stop()
+          this.setData({
+            recordState: false  //录音状态
+          })
+        }
       }
     }
     //识别结束事件
@@ -159,9 +172,10 @@ Page({
   // 按住说话
   touchStart: function (e) {
     // 同声传译语音开始识别
-    manager.start({
-      lang: 'zh_CN',// 识别的语言，目前支持zh_CN en_US zh_HK sichuanhua
-    })
+    manager.start(options)
+    // ({
+    //   lang: 'zh_CN',// 识别的语言，目前支持zh_CN en_US zh_HK sichuanhua
+    // })
     this.setData({
       startTime: e.timeStamp,
       recordState: true  //录音状态
@@ -189,9 +203,18 @@ Page({
 
     if (this.data.endTime - this.data.startTime < 500) {
       wx.showToast({
-        title: '请按住说话',
+        title: '说话时间过短',
       })
     }
-    
   },
+
+  touchTap: function (e) {
+    let that = this
+    if (that.data.recordState == false) {
+      that.touchStart(e)
+    } else {
+      that.touchEnd(e)
+      
+    }
+  }
 })
