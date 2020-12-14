@@ -1,35 +1,68 @@
 <!--index.wxml-->
 <view class="page">
-<view class="container">
-  <view class="userinfo">
-    <button wx:if="{{!hasUserInfo && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 请登录使用 </button>
-    <block wx:else>
-      <image bindtap="bindViewTap" class="userinfo-avatar" src="{{userInfo.avatarUrl}}" mode="cover"></image>
-      <view class="userinfo-nickname"> {{userInfo.nickName}}，您好！
-        <text>欢迎使用，您可以这样问我：</text>
-        <text class="tip-text" wx:for="{{tips}}" wx:key="index">
-          {{item}}
-        </text>
-      </view>
-    </block>
-  </view>
-  <view class="recordTextView">
-    {{text}}
-  </view>
-  <view class='recordView' wx:if="{{isLogin == true}}">
-      <!-- 同声传译 -->
-      <button class="recordBtn {{recordState == true ? 'recordBtnBg':''}}" 
-      catchtap="touchTap" 
-      >
-        <text wx:if="{{recordState == false}}">点击 说话</text>
-        <text wx:else>点击 结束</text>
-      </button>
-      <!-- 开始语音 弹出语音图标表示正在录音 -->
-      <cover-view class="startRecordImage" wx:if="{{recordState == true}}">
+  <view class="container">
+    <view class="userinfo">
+      <button wx:if="{{!hasUserInfo && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo" style=""> 请登录使用 </button>
+      <block wx:else>
+
+        <view>
+          <scroll-view scroll-y scroll-into-view='{{toView}}' style='height: {{scrollHeight}};'>
+            <!-- <view class='scrollMsg'> -->
+            <block wx:key wx:for='{{msgList}}' wx:for-index="index">
+
+              <!-- 单个消息1 ai发出（左） -->
+              <view wx:if='{{item.speaker=="server"}}' id='msg-{{index}}'
+                style='display: flex; padding: 2vw 11vw 2vw 2vw;'>
+                <view style='width: 11vw; height: 11vw;'>
+                  <image style='width: 11vw; height: 11vw; border-radius: 10rpx;' src='../../imgs/robot.png'></image>
+                </view>
+                <view
+                  style='width: 4vw; height: 11vw; margin-left: 0.5vw; display: flex; align-items: center; z-index: 9;'>
+                  <!-- <image style='width: 4vw;' src='../../images/left_msg.png' mode='widthFix'></image> -->
+                </view>
+                <text class='leftMsg'>{{item.content}}</text>
+              </view>
+
+              <!-- 单个消息2 用户发出（右） -->
+              <view wx:else id='msg-{{index}}'
+                style='display: flex; justify-content: flex-end; padding: 2vw 2vw 2vw 11vw;'>
+                <view class='rightMsg'>{{item.content}}</view>
+                <view
+                  style='width: 4vw; height: 11vw; margin-right: 0.5vw; display: flex; align-items: center; z-index: 9;'>
+                  <!-- <image style='width: 4vw;' src='../../images/right_msg.png' mode='widthFix'></image> -->
+                </view>
+                <view style='width: 11vw; height: 11vw;'>
+                  <image bindtap="bindViewTap" style='width: 11vw; height: 11vw; border-radius: 10rpx;' src='{{userInfo.avatarUrl}}'></image>
+                </view>
+              </view>
+
+            </block>
+            <!-- </view> -->
+
+<!-- 开始语音 弹出语音图标表示正在录音 -->
+<cover-view class="startRecordImage" wx:if="{{recordState == true}}">
         <cover-image src="../../imgs/recording.gif"></cover-image>
         <cover-view>请说...</cover-view>
       </cover-view>
 
+            <!-- 占位 -->
+            <view style='width: 100%; height: 18vw;'></view>
+          </scroll-view>
+
+          <view class='inputRoom' style='bottom: {{inputBottom}}'>
+            <image bindtap="getTips" style='width: 7vw; margin-left: 3.2vw;' src='../../imgs/robot.png' mode='widthFix'>
+            </image>
+            <!-- 同声传译 -->
+            <button class="recordBtn {{recordState == true ? 'recordBtnBg':''}}" catchtap="touchTap" adjust-position='{{false}}'>
+              <text wx:if="{{recordState == false}}">点击 说话</text>
+              <text wx:else>点击 结束</text>
+            </button>
+            <!-- <input bindconfirm='sendClick' adjust-position='{{false}}' value='{{inputVal}}' confirm-type='send'
+              bindfocus='focus' bindblur='blur'></input> -->
+          </view>
+        </view>
+
+      </block>
+    </view>
   </view>
-</view>
 </view>

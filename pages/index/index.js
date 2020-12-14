@@ -13,17 +13,47 @@ const options = {
 }
 //获取应用实例
 const app = getApp()
+var msgList = [];
+var inputVal = '';
+var sendResult = '';
+var windowWidth = wx.getSystemInfoSync().windowWidth;
+var windowHeight = wx.getSystemInfoSync().windowHeight;
+var keyHeight = 0;
+var tips = '';
 //上传服务器的地址
-const requestURL = 'http://192.168.0.13:8042/upload_voice'
-// const requestURL = 'https://ai.datacvg.com/aivoice/upload_voice'
-//'http://116.62.44.17/aivoice/upload_voice'
-//'http://192.168.0.59:8080/upload_voice' 
+// const requestURL = 'http://192.168.0.13:8042/upload_voice'
+const requestURL = 'https://ai.datacvg.com/aivoice/upload_voice'
+
 
 //获取全局唯一的语音识别管理器recordRecoManager
 const recorderManager = wx.getRecorderManager() //录音对象
 const innerAudioContext = wx.createInnerAudioContext() //播放对象
 
+
+/**
+ * 初始化数据
+ */
+function initData(that) {
+  inputVal = '';
+  sendResult = '';
+  tips = '您好，您可以这样问我：\n1.2019年10月航天南洋经营状况\n2.航天南洋位置\n3.2019年10月高新区经济状况\n4.2019年10月高新区规上企业税收收入大于1000万元的企业分布情况\n5.2019年10月高新区规上企业税收收入大于1000万元的企业列表',
+  
+  msgList = [{
+      speaker: 'server',
+      contentType: 'text',
+      content: tips
+    },
+  ]
+  that.setData({
+    msgList,
+    inputVal
+  })
+}
+
 Page({
+  /**
+   * 页面的初始数据
+   */
   data: {
     userInfo: {},
     hasUserInfo: false,
@@ -43,18 +73,19 @@ Page({
            '4.“区域”“标签”“指标以及范围”的企业分布情况', 
            '5.“时间”“区域”“标签”“指标以及范围”的企业列表'
           ],
+
+    scrollHeight: '100vh',
+    inputBottom: 0
   },
-  bindViewTap: function() {
-    wx.navigateTo({
-      // url: '../recordToText/record-to-text'
-    })
-  },
+
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function () {
     //识别语音
     this.initRecord();
+    //初始化数据
+    initData(this);
         
     if (app.globalData.userInfo) {
       this.setData({
@@ -92,11 +123,12 @@ Page({
     this.setData({
       isLogin: true,
       userInfo: e.detail.userInfo,
-      hasUserInfo: true
+      hasUserInfo: true,
     })
   },
   //调接口
   uploadText() {
+    let that = this
     wx.request({
       // method: "POST",
       url: requestURL,
@@ -108,9 +140,16 @@ Page({
         voice_t: this.data.text,//（String，语音文本）
       },
       success: function (res) {
-        console.log("上传成功")
+        console.log("上传成功 res=" + res)
+        if (res.data["code"] == '200') {
+          let text = res.data.data["text"]
+          that.sendResult(text)
+        } else {
+          that.sendResult('对不起，我没有听懂。')
+        }
       },
       fail: function(err) {
+        that.sendResult('对不起，我没有听懂。')
         console.log("上传失败")
         console.log(err.errMsg)
       }
@@ -166,6 +205,9 @@ Page({
         fileUrl: res.tempFilePath
       })
 
+      //语音转换成功 用户发言
+      that.sendClick(text)
+      //上传语音文字
       that.uploadText()
     }
   },
@@ -216,5 +258,94 @@ Page({
       that.touchEnd(e)
       
     }
-  }
+  },
+
+  /**
+   * 获取聚焦
+   */
+  focus: function(e) {
+    keyHeight = e.detail.height;
+    this.setData({
+      scrollHeight: (windowHeight - keyHeight) + 'px'
+    });
+    this.setData({
+      toView: 'msg-' + (msgList.length - 1),
+      inputBottom: keyHeight + 'px'
+    })
+    //计算msg高度
+    // calScrollHeight(this, keyHeight);
+
+  },
+
+  //失去聚焦(软键盘消失)
+  blur: function() {
+    this.setData({
+      scrollHeight: '100vh',
+      inputBottom: 0
+    })
+    this.setData({
+      toView: 'msg-' + (msgList.length - 1)
+    })
+
+  },
+
+  /**
+   * 发送点击监听
+   */
+  sendClick: function(text) {
+    msgList.push({
+      speaker: 'customer',
+      contentType: 'text',
+      content: text
+    })
+    inputVal = '';
+    this.setData({
+      msgList,
+      inputVal
+    });
+    this.blur();
+  },
+
+  /**
+   * 发送反馈
+   */
+  sendResult: function(text) {
+    msgList.push({
+      speaker: 'server',
+      contentType: 'text',
+      content: text
+    })
+    this.setData({
+      msgList,
+    });
+  },
+
+  /**
+   * 退回上一页
+   */
+  toBackClick: function() {
+    wx.navigateBack({})
+  },
+
+  /**
+   * 点击发送提示
+   */
+  getTips: function(result) {
+    let that = this
+    msgList.push({
+      speaker: 'server',
+      contentType: 'text',
+      content: tips
+    })
+    this.setData({
+      msgList,
+    });
+    this.blur();
+  },
+
+  bindViewTap: function() {
+    wx.navigateTo({
+      url: '../../contact/contact'
+    })
+  },
 })
